@@ -1,0 +1,131 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "URL Shortener API",
+      "description": "This API shortens URLs, stores the URLs in a database and provides statistics on their usage.",
+      "version": "1.0.0"
+    },
+    "host": "127.0.0.1:8000",
+    "basePath": "/",
+    "schemes": ["http"],
+    "paths": {
+      "/shorten": {
+        "post": {
+          "summary": "Shortens a URL",
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/ShortenRequest"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "URL has been shortened successfully",
+              "schema": {
+                "$ref": "#/definitions/ShortenResponse"
+              }
+            },
+            "400": {
+              "description": "URL is not present"
+            },
+            "409": {
+              "description": "The provided shortcode is already in use"
+            },
+            "412": {
+              "description": "The provided shortcode is invalid"
+            }
+          }
+        }
+      },
+      "/{shortcode}": {
+        "get": {
+          "summary": "Redirect to the original URL",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "shortcode",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "302": {
+              "description": "Redirecting to the original URl"
+            },
+            "404": {
+              "description": "Shortcode not found"
+            }
+          }
+        }
+      },
+      "/{shortcode}/stats": {
+        "get": {
+          "summary": "Get the statistics of a given shortcode",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "shortcode",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Statistics fetched successfully",
+              "schema": {
+                "$ref": "#/definitions/StatsResponse"
+              }
+            },
+            "404": {
+              "description": "Shortcode not found"
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "ShortenRequest": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "shortcode": {
+            "type": "string"
+          }
+        }
+      },
+      "ShortenResponse": {
+        "type": "object",
+        "properties": {
+          "shortcode": {
+            "type": "string"
+          }
+        }
+      },
+      "StatsResponse": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "lastRedirect": {
+            "type": "string"
+          },
+          "redirectCount": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+  
